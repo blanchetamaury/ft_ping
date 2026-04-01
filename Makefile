@@ -12,6 +12,7 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	$(C) -o $(NAME) $^ $(FLAGS)
+	sudo setcap cap_net_raw+ep ./ft_ping
 
 clean:
 	rm -f $(OBJ)

@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 19:58:07 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/01 20:21:57 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/01 20:57:55 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,9 @@ void	print_header(t_ping *p)
 }
 
 
-void    print_loop(t_ping *p)
+void    print_loop(t_ping *p, int size)
 {
-    printf("%d bytes from %s: ", p->package_size, p->dns);
+    printf("%d bytes from %s: ", size, p->dns);
     printf("icmp_seq=%d ", p->param.icmp_seq);
     printf("ttl=%d ", p->param.ttl);
     printf("time=%.1f ms", p->param.time);

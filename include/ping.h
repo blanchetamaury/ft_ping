@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 19:58:17 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/01 20:25:56 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/01 21:14:21 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,14 @@
 
 # define PACKAGE_SIZE 64
 # define USLEEP_ONE_SEC 1000000
+
+struct icmp_echo {
+    uint8_t  type;      // 8 for Echo Request, 0 for Echo Reply
+    uint8_t  code;      // Usually 0
+    uint16_t checksum;  // Filled after calculation
+    uint16_t ident;     // Process identifier (e.g., getpid())
+    uint16_t seq;       // Sequence number
+};
 
 typedef struct s_param
 {
@@ -54,6 +62,7 @@ typedef struct s_packageIP
 
 typedef struct s_ping
 {
+	int				socket;
 	struct addrinfo	*result;
 	char			*addr_name;
 	char			dns[INET6_ADDRSTRLEN];
@@ -64,7 +73,7 @@ typedef struct s_ping
 
 ///  print.c
 void	print_end(t_ping *p);
-void	print_loop(t_ping *p);
+void	print_loop(t_ping *p, int size);
 void	print_header(t_ping *p);
 ///  signal.c
 void	check_signal(int signal);
