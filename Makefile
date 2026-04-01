@@ -2,7 +2,7 @@ C=cc
 
 CFLAGS= -Wall -Werror -Wextra -g -Iinclude/
 
-SRC= srcs/main.c
+SRC= srcs/main.c srcs/print.c srcs/signal.c srcs/init.c
 
 OBJ= $(SRC:%.c=%.o)
 

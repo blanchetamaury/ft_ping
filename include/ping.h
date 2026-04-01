@@ -1,56 +1,76 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ping.h                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/04/01 19:58:17 by amaury            #+#    #+#             */
+/*   Updated: 2026/04/01 20:25:56 by amaury           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef PING_H
-#define PING_H
+# define PING_H
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#include <netdb.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <arpa/inet.h>
-#include <sys/time.h>
-#include <unistd.h>
-#include <signal.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <unistd.h>
+# include <netdb.h>
+# include <stdlib.h>
+# include <string.h>
+# include <stdio.h>
+# include <arpa/inet.h>
+# include <sys/time.h>
+# include <unistd.h>
+# include <signal.h>
 
-#define PACKAGE_SIZE 64
-#define USLEEP_ONE_SEC 1000000
+# define PACKAGE_SIZE 64
+# define USLEEP_ONE_SEC 1000000
 
+typedef struct s_param
+{
+	int			icmp_seq;
+	u_int8_t	ttl;
+	uint32_t	port;
 
+	double		time;
+	double		total_time;
+	double		min_time;
+	double		max_time;
+	double		avg;
+	double		mdev;
+}				t_param;
 
-typedef struct s_param {
-    int         icmp_seq;
-    u_int8_t    ttl;
-    uint32_t    port;
+typedef struct s_packageIP
+{
+	char	*all;
+	int		all_size;
+	char	*data;
+	int		data_size;
+	char	header_ip[20];
+	char	header_icmp[8];
+}			t_packageIP;
 
-    double time;
-    double totaltime;
-    double minTime;
-    double maxTime;
-    double avg;
-    double mdev;
-}   t_param;
+typedef struct s_ping
+{
+	struct addrinfo	*result;
+	char			*addr_name;
+	char			dns[INET6_ADDRSTRLEN];
+	int				package_size;
+	t_packageIP		package;
+	t_param			param;
+}					t_ping;
 
-typedef struct s_packageIP {
-    char *all;
-    int  allSize;
-    char *data;
-    int  dataSize;
-    char headerIp[20];
-    char headerIcmp[8];
-}   t_packageIP;
-
-typedef struct s_ping {
-    struct addrinfo *result;
-    char            *addrName;
-    char            DNS[INET6_ADDRSTRLEN];
-
-    int         packageSize;
-    t_packageIP package;
-    
-    t_param     param;
-
-}   t_ping;
-
+///  print.c
+void	print_end(t_ping *p);
+void	print_loop(t_ping *p);
+void	print_header(t_ping *p);
+///  signal.c
+void	check_signal(int signal);
+void	create_signal(void);
+///  init.c
+void	init_param(t_ping *p);
+int		init_package(t_ping *p);
+void	init_hints(struct addrinfo *hints);
 #endif
