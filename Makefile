@@ -12,7 +12,7 @@ NAME=ft_ping
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(C) -o $(NAME) $^ $(FLAGS) $(ASAN_FLAGS)
+	$(C) -o $(NAME) $^ $(FLAGS)
 	sudo setcap cap_net_raw+ep ./ft_ping
 
 debug: $(OBJ)
