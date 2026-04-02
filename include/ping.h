@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 19:58:17 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/02 12:38:21 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/02 15:38:39 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,4 +86,11 @@ int		init_package(t_ping *p);
 void	init_hints(struct addrinfo *hints);
 ///  main.c
 void	free_all(t_ping *p);
+///  package.c
+void		package_send(t_ping *p, struct timeval start, struct timeval last);
+void		package_error(t_ping *p, struct timeval start, struct timeval last);
+uint16_t	calculate_checksum(unsigned char* buffer, int bytes);
+void		build_icmp_packet(t_ping *p);
+void    	get_header(t_ping *p);
+
 #endif
