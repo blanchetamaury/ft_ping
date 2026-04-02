@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 19:58:17 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/01 21:14:21 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/02 10:07:06 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,17 +28,19 @@
 # define PACKAGE_SIZE 64
 # define USLEEP_ONE_SEC 1000000
 
-struct icmp_echo {
-    uint8_t  type;      // 8 for Echo Request, 0 for Echo Reply
-    uint8_t  code;      // Usually 0
-    uint16_t checksum;  // Filled after calculation
-    uint16_t ident;     // Process identifier (e.g., getpid())
-    uint16_t seq;       // Sequence number
-};
+typedef struct s_icmp
+{
+    uint8_t		type;
+    uint8_t		code;
+    uint16_t	checksum;
+    uint16_t	ident;
+    uint16_t	seq;
+} 			t_icmp;
 
 typedef struct s_param
 {
 	int			icmp_seq;
+	int			received;
 	u_int8_t	ttl;
 	uint32_t	port;
 

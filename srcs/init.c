@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 20:24:29 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/01 20:37:53 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/02 10:06:56 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	init_param(t_ping *p)
 	p->param.mdev = 0;
 	p->param.total_time = 0;
 	p->param.ttl = 255;
+	p->param.received = 0;
 }
 
 int	init_package(t_ping *p)
