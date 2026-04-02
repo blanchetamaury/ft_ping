@@ -3,7 +3,7 @@ C=cc
 CFLAGS= -Wall -Werror -Wextra -g -Iinclude/
 ASAN_FLAGS = -fsanitize=address
 
-SRC= srcs/main.c srcs/print.c srcs/signal.c srcs/init.c srcs/package.c
+SRC= srcs/main.c srcs/print.c srcs/signal.c srcs/init.c srcs/package.c srcs/parsing.c
 
 OBJ= $(SRC:%.c=%.o)
 

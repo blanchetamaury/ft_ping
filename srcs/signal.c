@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 20:16:10 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/01 20:18:29 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/02 19:15:05 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ void	check_signal(int signal)
 	if (signal == SIGINT)
 	{
 		g_verif = 0;
-		printf("\n");
 		return ;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 19:58:10 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/02 15:38:21 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/02 22:49:36 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,10 @@ void	set_ipv(t_ping *p)
 		p->param.port = ntohs(ipv4->sin_port);
 		addr = &ipv4->sin_addr;
 		p->socket = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
-		setsockopt(p->socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+		if (p->debug == true)
+			setsockopt(p->socket, SOL_SOCKET, SO_RCVTIMEO | SO_DEBUG, &timeout, sizeof(timeout));
+		else
+			setsockopt(p->socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 	}
 	else if (p->result->ai_family == AF_INET6)
 	{
@@ -48,7 +51,10 @@ void	set_ipv(t_ping *p)
 		p->param.port = ntohs(ipv6->sin6_port);
 		p->socket = socket(AF_INET6, SOCK_RAW, IPPROTO_ICMPV6);
 		on = 1;
-		setsockopt(p->socket, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &on, sizeof(on));
+		if (p->debug == true)
+			setsockopt(p->socket, IPPROTO_IPV6, IPV6_RECVHOPLIMIT | SO_DEBUG, &on, sizeof(on));
+		else
+			setsockopt(p->socket, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &on, sizeof(on));
 	}
 	else
 		return ;
@@ -83,38 +89,41 @@ void	resize_time_tab(t_ping *p)
 	p->param.size_tab *= 2;
 }
 
-void	loop(t_ping *p)
+int	loop(t_ping *p)
 {
-	struct timeval	start;
 	struct timeval	last;
 	struct timeval	first;
 	int				bytesread;
 
-	init_param(p);
+	create_package(p);
 	print_header(p);
 	
 	gettimeofday(&first, NULL);
 	while (g_verif)
 	{
+		if (p->param.limit_icmp_seq != -1 && p->param.limit_icmp_seq <= p->param.icmp_seq)
+			return (1);
 		p->param.icmp_seq++;
 		if (p->param.icmp_seq > p->param.size_tab)
 			resize_time_tab(p);
 		build_icmp_packet(p);
 		
 		sendto(p->socket, p->package.all, p->package.all_size, 0, p->result->ai_addr, p->result->ai_addrlen);
-		gettimeofday(&start, NULL);
+		gettimeofday(&p->param.start, NULL);
 		
 		bytesread = recvfrom(p->socket, p->package.all, p->package.all_size, 0, NULL, NULL);
 		gettimeofday(&last, NULL);
+		p->param.lauch_time = ((last.tv_sec - first.tv_sec) * 1000000.0 + (last.tv_usec - first.tv_usec)) / 1000.0;
 		
 		if (bytesread > 0)
-			package_send(p, start, last);
+			package_send(p, p->param.start, last);
 		else
-			package_error(p, start, last);
+			package_error(p, p->param.start, last);
 		set_stats_time(p);
-		usleep(USLEEP_ONE_SEC);
+		if (p->wait == true)
+			usleep(USLEEP_ONE_SEC);
 	}
-	p->param.lauch_time = ((last.tv_sec - first.tv_sec) * 1000000.0 + (last.tv_usec - first.tv_usec)) / 1000.0;
+	return (0);
 }
 
 int	check_addr(char *name, t_ping *p)
@@ -133,7 +142,8 @@ int	check_addr(char *name, t_ping *p)
 	{
 		p->result = i;
 		set_ipv(p);
-		loop(p);
+		if (loop(p) == 1)
+			break ;
 	}
 	return (0);
 }
@@ -148,10 +158,17 @@ int	main(int argc, char **argv)
 		exit(1);
 	}
 	create_signal();
+	init_ping(&p);
 	if (init_package(&p) == 1)
 		return (1);
-	if (check_addr(argv[argc - 1], &p) == 1)
-		return (1);
+	init_param(&p);
+	parsing(&p, argv, argc);
+	if (check_addr(argv[argc - 1], &p) == 1) {
+		printf("ping: %s: Nom ou service inconnu\n\n", argv[argc - 1]);
+		print_help();
+		free_all(&p);
+		exit(1);
+	}
 	print_end(&p);
 	free_all(&p);
 }
