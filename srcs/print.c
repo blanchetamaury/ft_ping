@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 19:58:07 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/01 20:57:55 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/02 10:12:49 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void    print_loop(t_ping *p, int size)
 
 void    print_end(t_ping *p)
 {
-    printf("--- %s ping statistics ---\n", p->dns);
-    printf("%d packets transmitted, %d received, %d%% packet loss, time %.1fms\n", p->param.icmp_seq, p->param.icmp_seq, 100, p->param.total_time);
+    printf("--- %s ping statistics ---\n", p->addr_name);
+    printf("%d packets transmitted, %d received, %d%% packet loss, time %.1fms\n", p->param.icmp_seq, p->param.received, 100 - 100 * p->param.received / p->param.icmp_seq, p->param.total_time);
     printf("rtt min/avg/max/mdev = %.1f/%.1f/%.1f/%.1d ms\n", p->param.min_time, p->param.avg, p->param.max_time, 100);
 }
