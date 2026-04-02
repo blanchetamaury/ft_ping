@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 19:58:17 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/02 10:07:06 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/02 12:38:21 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,13 +43,15 @@ typedef struct s_param
 	int			received;
 	u_int8_t	ttl;
 	uint32_t	port;
+	int			size_tab;
+	double		*time_tab;
 
 	double		time;
+	double		lauch_time;
 	double		total_time;
 	double		min_time;
 	double		max_time;
 	double		avg;
-	double		mdev;
 }				t_param;
 
 typedef struct s_packageIP
@@ -58,8 +60,6 @@ typedef struct s_packageIP
 	int		all_size;
 	char	*data;
 	int		data_size;
-	char	header_ip[20];
-	char	header_icmp[8];
 }			t_packageIP;
 
 typedef struct s_ping
@@ -84,4 +84,6 @@ void	create_signal(void);
 void	init_param(t_ping *p);
 int		init_package(t_ping *p);
 void	init_hints(struct addrinfo *hints);
+///  main.c
+void	free_all(t_ping *p);
 #endif

@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 19:58:10 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/02 10:53:46 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/02 12:39:40 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,30 +14,34 @@
 
 int	g_verif = 1;
 
+void	free_all(t_ping *p)
+{
+	free(p->package.all);
+	free(p->package.data);
+	free(p->param.time_tab);
+	freeaddrinfo(p->result);
+}
+
 uint16_t calculate_checksum(unsigned char* buffer, int bytes) {
     uint32_t checksum = 0;
     unsigned char* end = buffer + bytes;
 
-    // Handle odd bytes by adding the last byte to the checksum
     if (bytes % 2 == 1) {
         end = buffer + bytes - 1;
         checksum += (*end) << 8;
     }
 
-    // Add words of two bytes
     while (buffer < end) {
-		checksum += *(uint16_t *)buffer;  // lecture native
+		checksum += *(uint16_t *)buffer;
 		buffer += 2;
 	}
 
-    // Fold carry bits
     uint32_t carray = checksum >> 16;
     while (carray) {
         checksum = (checksum & 0xffff) + carray;
         carray = checksum >> 16;
     }
 
-    // Return one's complement
     checksum = ~checksum;
     return checksum & 0xffff;
 }
@@ -112,7 +116,6 @@ void    get_header(t_ping *p) {
 	p->param.ttl = buf[8];
 }
 
-
 void	package_send(t_ping *p, struct timeval start, struct timeval last)
 {
 	t_icmp	*reply;
@@ -135,15 +138,36 @@ void	package_send(t_ping *p, struct timeval start, struct timeval last)
 
 	p->param.received++;
 	p->param.time = ((last.tv_sec - start.tv_sec) * 1000000.0 + (last.tv_usec - start.tv_usec)) / 1000.0;
-	set_stats_time(p);
+	p->param.total_time += p->param.time;
+	p->param.time_tab[p->param.icmp_seq - 1] = p->param.time;
 	print_loop(p, p->package_size);
 }
 
 void	package_error(t_ping *p, struct timeval start, struct timeval last)
 {
 	p->param.time = ((last.tv_sec - start.tv_sec) * 1000000.0 + (last.tv_usec - start.tv_usec)) / 1000.0;
-	set_stats_time(p);
+	p->param.total_time += p->param.time;
+	p->param.time_tab[p->param.icmp_seq - 1] = p->param.time;
 	print_loop(p, 0);
+}
+
+
+void	resize_time_tab(t_ping *p)
+{
+	double	*new;
+
+	new = calloc(p->param.size_tab * 2, sizeof(double));
+	if (new == NULL) {
+		printf("ft_ping Error memory allocation\n");
+		free_all(p);
+		exit(1);
+	}
+	for (int i = 0; i < p->param.size_tab; i++) {
+		new[i] = p->param.time_tab[i];
+	}
+	free(p->param.time_tab);
+	p->param.time_tab = new;
+	p->param.size_tab *= 2;
 }
 
 void	loop(t_ping *p)
@@ -160,6 +184,8 @@ void	loop(t_ping *p)
 	while (g_verif)
 	{
 		p->param.icmp_seq++;
+		if (p->param.icmp_seq > p->param.size_tab)
+			resize_time_tab(p);
 		build_icmp_packet(p);
 		
 		sendto(p->socket, p->package.all, p->package.all_size, 0, p->result->ai_addr, p->result->ai_addrlen);
@@ -172,9 +198,10 @@ void	loop(t_ping *p)
 			package_send(p, start, last);
 		else
 			package_error(p, start, last);
+		set_stats_time(p);
 		usleep(USLEEP_ONE_SEC);
 	}
-	p->param.total_time = ((last.tv_sec - first.tv_sec) * 1000000.0 + (last.tv_usec - first.tv_usec)) / 1000.0;
+	p->param.lauch_time = ((last.tv_sec - first.tv_sec) * 1000000.0 + (last.tv_usec - first.tv_usec)) / 1000.0;
 }
 
 int	check_addr(char *name, t_ping *p)
@@ -196,13 +223,6 @@ int	check_addr(char *name, t_ping *p)
 		loop(p);
 	}
 	return (0);
-}
-
-void	free_all(t_ping *p)
-{
-	free(p->package.all);
-	free(p->package.data);
-	freeaddrinfo(p->result);
 }
 
 int	main(int argc, char **argv)

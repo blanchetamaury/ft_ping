@@ -1,6 +1,7 @@
 C=cc
 
 CFLAGS= -Wall -Werror -Wextra -g -Iinclude/
+ASAN_FLAGS = -fsanitize=address
 
 SRC= srcs/main.c srcs/print.c srcs/signal.c srcs/init.c
 
@@ -11,8 +12,11 @@ NAME=ft_ping
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(C) -o $(NAME) $^ $(FLAGS)
+	$(C) -o $(NAME) $^ $(FLAGS) $(ASAN_FLAGS)
 	sudo setcap cap_net_raw+ep ./ft_ping
+
+debug: $(OBJ)
+	$(C) -o $(NAME) $^ $(FLAGS) $(ASAN_FLAGS)
 
 clean:
 	rm -f $(OBJ)
