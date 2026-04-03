@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 19:58:17 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/02 22:43:28 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/03 14:53:08 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,9 @@ typedef struct s_ping
 	bool			sound;
 	bool			wait;
 	bool			debug;
+	bool			verbose;
+	bool			reverse;
+	char			hbuf[NI_MAXHOST];
 	t_packageIP		package;
 	t_param			param;
 }					t_ping;

@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 19:58:07 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/02 21:47:10 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/03 14:54:35 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	print_header(t_ping *p)
 {
-	printf("PING %s ", p->addr_name);
+	printf("PING %s ", p->result->ai_canonname);
 	printf("(%s) ", p->dns);
 	printf(" %d(%d) bytes of data\n", p->package_size - 8, p->package_size + 20);
 }
@@ -24,7 +24,10 @@ void    print_loop(t_ping *p, int size)
 {
 	if (p->param.timestamp == true)
 		printf("[%f] ", (p->param.start.tv_sec * 1000000.0 + p->param.start.tv_usec) / 1000.0);
-    printf("%d bytes from %s: ", size, p->dns);
+    if (p->reverse == true)
+		printf("%d bytes from %s: ", size, p->hbuf);
+	else
+		printf("%d bytes from %s: ", size, p->dns);
     printf("icmp_seq=%d ", p->param.icmp_seq);
     printf("ttl=%d ", p->param.ttl);
     printf("time=%.2f ms", p->param.time);

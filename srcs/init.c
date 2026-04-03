@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 20:24:29 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/02 21:39:27 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/03 10:40:55 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ void init_ping(t_ping *p)
 	p->wait = true;
 	p->result = NULL;
 	p->debug = false;
+	p->verbose = false;
 }
 
 void	init_hints(struct addrinfo *hints)

@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/02 17:45:27 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/02 22:50:23 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/03 10:41:06 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	parsing(t_ping *p, char **argv, int argc)
 {	
 	int opt;
 
-	while ((opt = getopt(argc, argv, "aAchVDds")) != -1)
+	while ((opt = getopt(argc, argv, "?aAchVDdsv")) != -1)
 	{
 		switch (opt)
 		{
@@ -59,6 +59,9 @@ void	parsing(t_ping *p, char **argv, int argc)
 				printf("ft_ping from amblanch v.20260402\n");
 				free_all(p);
 				exit (1);
+				break ;
+			case 'v':
+				p->verbose = true;
 				break ;
 			case 'D':
 				p->param.timestamp = true;

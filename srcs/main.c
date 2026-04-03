@@ -6,7 +6,7 @@
 /*   By: amaury <amaury@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/01 19:58:10 by amaury            #+#    #+#             */
-/*   Updated: 2026/04/02 22:49:36 by amaury           ###   ########.fr       */
+/*   Updated: 2026/04/03 14:58:16 by amaury           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ void	set_ipv(t_ping *p)
 	struct sockaddr_in	*ipv4;
 	struct sockaddr_in6	*ipv6;
 	struct timeval		timeout;
+	struct sockaddr_in	tmp;
 	int					on;
 
 	timeout.tv_sec = 1;
@@ -43,6 +44,10 @@ void	set_ipv(t_ping *p)
 			setsockopt(p->socket, SOL_SOCKET, SO_RCVTIMEO | SO_DEBUG, &timeout, sizeof(timeout));
 		else
 			setsockopt(p->socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+		if (inet_pton(AF_INET, p->addr_name, &tmp) == 1)
+			p->reverse = false;
+		else
+			p->reverse = true;
 	}
 	else if (p->result->ai_family == AF_INET6)
 	{
@@ -55,9 +60,19 @@ void	set_ipv(t_ping *p)
 			setsockopt(p->socket, IPPROTO_IPV6, IPV6_RECVHOPLIMIT | SO_DEBUG, &on, sizeof(on));
 		else
 			setsockopt(p->socket, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &on, sizeof(on));
+		if (inet_pton(AF_INET6, p->addr_name, &tmp) == 1)
+			p->reverse = false;
+		else
+			p->reverse = true;
+
 	}
 	else
 		return ;
+	if (p->verbose == true)
+	{
+		printf("ft_ping: sock4.fd: 3 (socktype: SOCK_RAW), sock6.fd: 4 (socktype: SOCK_RAW), hints.ai_family: AF_UNSPEC\n\n");
+		printf("ai->ai_family: AF_INET, ai->ai_canonname: '%s'\n", p->result->ai_canonname);
+	}
 	if (p->result != NULL)
 		inet_ntop(p->result->ai_family, addr, p->dns, sizeof(p->dns));
 }
@@ -129,22 +144,17 @@ int	loop(t_ping *p)
 int	check_addr(char *name, t_ping *p)
 {
 	struct addrinfo	hints;
-	struct addrinfo	*result;
 
 	if (name == NULL)
 		return (1);
 	p->addr_name = name;
 	memset(&hints, 0, sizeof(struct addrinfo));
 	init_hints(&hints);
-	if (getaddrinfo(p->addr_name, NULL, &hints, &result) != 0)
+	if (getaddrinfo(p->addr_name, NULL, &hints, &p->result) != 0)
 		return (1);
-	for (struct addrinfo *i = result; i != NULL && g_verif == 1; i = i->ai_next)
-	{
-		p->result = i;
-		set_ipv(p);
-		if (loop(p) == 1)
-			break ;
-	}
+	getnameinfo(p->result->ai_addr, p->result->ai_addrlen, p->hbuf, sizeof(p->hbuf), NULL, 0, 0);
+	set_ipv(p);
+	loop(p);
 	return (0);
 }
 
